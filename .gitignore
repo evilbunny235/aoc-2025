@@ -1,0 +1,5 @@
+.cache
+.direnv
+.env
+.envrc
+/target
