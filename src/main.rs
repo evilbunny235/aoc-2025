@@ -12,7 +12,7 @@ fn main() {
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
 
-    let result = day6::solve_part_1(&buf);
+    let result = day6::solve_part_2(&buf);
 
     println!("{result}");
 }
