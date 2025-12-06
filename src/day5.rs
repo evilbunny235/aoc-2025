@@ -85,7 +85,5 @@ mod tests {
     #[test]
     fn p2() {
         assert_eq!(solve_part_2(TEST_DATA), 14);
-
-        assert!(false);
     }
 }
