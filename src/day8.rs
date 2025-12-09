@@ -1,4 +1,4 @@
-use std::collections::BinaryHeap;
+use std::{cmp::Reverse, collections::BinaryHeap};
 
 pub fn solve_part_1(input: &str, max_nodes_in_heap: usize) -> u64 {
     let mut nodes = vec![];
@@ -93,6 +93,86 @@ pub fn solve_part_1(input: &str, max_nodes_in_heap: usize) -> u64 {
     (circuits[0].len() * circuits[1].len() * circuits[2].len()) as u64
 }
 
+pub fn solve_part_2(input: &str) -> u64 {
+    let mut nodes = vec![];
+
+    for line in input.trim().lines() {
+        let mut coords = line.splitn(3, ',');
+        let x = coords.next().unwrap().parse().unwrap();
+        let y = coords.next().unwrap().parse().unwrap();
+        let z = coords.next().unwrap().parse().unwrap();
+
+        nodes.push(Node { x, y, z });
+    }
+
+    let mut distance_heap = BinaryHeap::with_capacity((nodes.len() * nodes.len() + 1) / 2);
+
+    for i in 0..nodes.len() - 1 {
+        for j in i + 1..nodes.len() {
+            let distance = distance_squared(&nodes[i], &nodes[j]);
+
+            distance_heap.push(Reverse(NodeDistance {
+                node_1: i,
+                node_2: j,
+                distance: distance,
+            }));
+        }
+    }
+
+    let mut circuits: Vec<Vec<usize>> = Vec::with_capacity(nodes.len());
+
+    for i in 0..nodes.len() {
+        circuits.push(vec![i]);
+    }
+
+    let mut last_connected_nodes = (0, 0);
+    while circuits.len() > 1 {
+        let distance = distance_heap.pop().unwrap().0;
+
+        let mut node_1_circuit = None;
+        let mut node_2_circuit = None;
+
+        for (circuit_index, circuit) in circuits.iter().enumerate() {
+            for node in circuit {
+                if *node == distance.node_1 {
+                    node_1_circuit = Some(circuit_index);
+
+                    if node_2_circuit.is_some() {
+                        break;
+                    }
+                }
+
+                if *node == distance.node_2 {
+                    node_2_circuit = Some(circuit_index);
+
+                    if node_1_circuit.is_some() {
+                        break;
+                    }
+                }
+            }
+        }
+
+        let node_1_circuit = node_1_circuit.unwrap();
+        let node_2_circuit = node_2_circuit.unwrap();
+
+        if node_1_circuit != node_2_circuit {
+            let [dest, src] = circuits
+                .get_disjoint_mut([node_1_circuit, node_2_circuit])
+                .unwrap();
+
+            dest.append(src);
+            circuits.swap_remove(node_2_circuit);
+
+            last_connected_nodes = (distance.node_1, distance.node_2);
+        }
+    }
+
+    let last_connected_node_1 = &nodes[last_connected_nodes.0];
+    let last_connected_node_2 = &nodes[last_connected_nodes.1];
+
+    (last_connected_node_1.x * last_connected_node_2.x) as u64
+}
+
 #[derive(Debug)]
 struct Node {
     x: i64,
@@ -161,5 +241,12 @@ mod tests {
         let result = solve_part_1(TEST_DATA, 10);
 
         assert_eq!(result, 40);
+    }
+
+    #[test]
+    fn p2() {
+        let result = solve_part_2(TEST_DATA);
+
+        assert_eq!(result, 25272);
     }
 }

@@ -14,7 +14,7 @@ fn main() {
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
 
-    let result = day8::solve_part_1(&buf, 1000);
+    let result = day8::solve_part_2(&buf);
 
     println!("{result}");
 }
