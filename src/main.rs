@@ -6,15 +6,16 @@ pub mod day5;
 pub mod day6;
 pub mod day7;
 pub mod day8;
+pub mod day9;
 
 use std::{fs::File, io::Read};
 
 fn main() {
-    let mut file = File::open("inputs/day8.txt").unwrap();
+    let mut file = File::open("inputs/day9.txt").unwrap();
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
 
-    let result = day8::solve_part_2(&buf);
+    let result = day9::solve_part_1(&buf);
 
     println!("{result}");
 }
